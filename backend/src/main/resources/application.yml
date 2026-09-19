@@ -1,0 +1,125 @@
+# ============================================================================
+# TaskHub 后端主配置文件
+# 通用配置放在此文件，环境差异化配置放在 application-{profile}.yml
+# ============================================================================
+server:
+  port: 8080
+  # Tomcat 相关调优
+  tomcat:
+    threads:
+      max: 200
+    connection-timeout: 20s
+  # 优雅停机：等待正在处理的请求完成后再关闭容器
+  shutdown: graceful
+
+spring:
+  application:
+    name: taskhub-backend
+  profiles:
+    # 默认激活开发环境，可通过 -Dspring.profiles.active=prod 或环境变量覆盖
+    active: dev
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+  # ---------------- Jackson 全局序列化配置 ----------------
+  jackson:
+    # java.time.* 类型统一输出 ISO-8601 字符串（如 2026-09-13T10:00:00），前端可直接 new Date() 解析
+    # 注意：date-format 只作用于 java.util.Date，对 JSR-310 类型无效，因此这里不配置
+    time-zone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false
+      fail-on-empty-beans: false
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+
+  # ---------------- Spring Data JPA ----------------
+  jpa:
+    open-in-view: false            # 关闭 OSIV，避免在视图层触发懒加载导致的连接占用
+    hibernate:
+      naming:
+        # Spring Boot 默认命名策略：驼峰 -> 下划线
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: GMT+8
+
+  # ---------------- 请求体大小限制 ----------------
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  # ---------------- MVC 静态资源/404 处理 ----------------
+  mvc:
+    problemdetails:
+      enabled: false               # 使用自定义统一响应体，而非 RFC 7807 ProblemDetail
+  web:
+    resources:
+      add-mappings: true
+
+# ============================================================================
+# 应用自定义配置（对应 com.example.taskhub.config.AppProperties）
+# ============================================================================
+app:
+  cors:
+    # 允许跨域访问的前端源地址，生产环境请收敛为实际域名
+    allowed-origins:
+      - http://localhost:5173
+      - http://127.0.0.1:5173
+    allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
+  # 是否在应用启动时写入演示数据
+  seed-data: true
+
+# ============================================================================
+# springdoc-openapi（Swagger UI）
+#   UI  地址: http://localhost:8080/swagger-ui.html
+#   JSON 地址: http://localhost:8080/v3/api-docs
+# ============================================================================
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method      # 按 HTTP 方法排序
+    tags-sorter: alpha
+    display-request-duration: true
+    doc-expansion: list
+  default-produces-media-type: application/json
+  packages-to-scan: com.example.taskhub.controller
+
+# ============================================================================
+# Actuator 监控端点
+# ============================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: TaskHub Backend
+    version: 1.0.0
+    description: 前后端分离示例项目的后端服务
+
+# ============================================================================
+# 日志级别
+# ============================================================================
+logging:
+  level:
+    root: INFO
+    com.example.taskhub: DEBUG
+    org.hibernate.SQL: DEBUG

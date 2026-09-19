@@ -1,0 +1,258 @@
+/**
+ * 全局样式入口。
+ *
+ * 设计原则：
+ * 1. **用 CSS 自定义属性做设计令牌**，而不是 Sass 变量 + additionalData 注入。
+ *    前者可被运行时主题切换覆盖，也不会让每个组件都隐式依赖一份全局变量表。
+ * 2. 组件内的 `<style scoped lang="scss">` 只使用嵌套与父选择器，
+ *    不写会影响其他组件的全局规则。
+ * 3. Element Plus 的样式覆盖统一收敛在 `.ep-` 选择器下，便于查找与维护。
+ */
+
+// ---------------------------------------------------------------------------
+// 设计令牌
+// ---------------------------------------------------------------------------
+:root {
+  // 布局尺寸
+  --app-sidebar-width: 220px;
+  --app-sidebar-collapsed-width: 64px;
+  --app-header-height: 60px;
+  --app-content-padding: 20px;
+  --app-border-radius: 8px;
+
+  // 颜色
+  --app-bg-page: #f5f7fa;
+  --app-bg-container: #ffffff;
+  --app-text-primary: #303133;
+  --app-text-regular: #606266;
+  --app-text-secondary: #909399;
+  --app-border-color: #e4e7ed;
+  --app-shadow-card: 0 2px 12px 0 rgb(0 0 0 / 6%);
+  --app-shadow-hover: 0 4px 16px 0 rgb(0 0 0 / 12%);
+
+  // 过渡
+  --app-transition-duration: 0.25s;
+}
+
+// ---------------------------------------------------------------------------
+// 基础重置
+// ---------------------------------------------------------------------------
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--app-text-primary);
+  background-color: var(--app-bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ---------------------------------------------------------------------------
+// 通用工具类
+// ---------------------------------------------------------------------------
+
+/** 卡片容器：页面中每一块内容区域 */
+.app-card {
+  padding: var(--app-content-padding);
+  background-color: var(--app-bg-container);
+  border-radius: var(--app-border-radius);
+  box-shadow: var(--app-shadow-card);
+}
+
+/** 区块标题 */
+.app-section-title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-text-primary);
+
+  &::before {
+    width: 3px;
+    height: 14px;
+    content: '';
+    background-color: var(--el-color-primary);
+    border-radius: 2px;
+  }
+}
+
+/** 次要说明文字 */
+.app-text-secondary {
+  font-size: 12px;
+  color: var(--app-text-secondary);
+}
+
+/** 单行省略 */
+.app-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/** 表格上方的操作栏 */
+.app-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/** 分页条 */
+.app-pagination {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/**
+ * 表格行内操作按钮组。
+ *
+ * 两处必要性：
+ * 1. 当首个按钮被 el-dropdown 包裹时，`.el-button + .el-button` 的默认 12px 外边距
+ *    对其后的按钮并不生效（前一个兄弟是 div 而非 button），会出现间距忽有忽无，
+ *    因此统一清零并交给 gap 控制。
+ * 2. 收窄水平内边距，为下拉触发按钮 loading 态额外插入的图标（约 +17px）腾出空间，
+ *    否则请求进行中会溢出换行。
+ */
+.app-table-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+
+  .el-button {
+    margin-left: 0;
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+}
+
+/** 操作菜单项中的补充说明文字，承载 el-tag 颜色无法表达的语义 */
+.app-action-hint {
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--app-text-secondary);
+}
+
+/** 溢出菜单中的危险操作项，与并排按钮的 type="danger" 保持同一视觉语义 */
+.app-action-danger {
+  color: var(--el-color-danger);
+}
+
+// ---------------------------------------------------------------------------
+// 路由切换动画
+// ---------------------------------------------------------------------------
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition:
+    opacity var(--app-transition-duration) ease,
+    transform var(--app-transition-duration) ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-12px);
+}
+
+// ---------------------------------------------------------------------------
+// Element Plus 局部覆盖
+// ---------------------------------------------------------------------------
+
+// 表格：统一表头底色与单元格内边距
+.ep-table {
+  th.ep-table__cell {
+    font-weight: 600;
+    color: var(--app-text-regular);
+    background-color: #fafafa;
+  }
+}
+
+// 弹窗：内容区滚动条更贴合容器
+.ep-dialog__body {
+  padding-top: 12px;
+}
+
+// 滚动条美化（Webkit 内核）
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(144 147 153 / 40%);
+  border-radius: 4px;
+
+  &:hover {
+    background-color: rgb(144 147 153 / 70%);
+  }
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+// ---------------------------------------------------------------------------
+// 响应式
+//
+// 断点约定：
+// - ≤1200px：统计卡片由 4 列降为 2 列
+// - ≤768px ：侧边栏改为抽屉式浮层，筛选表单转为单列
+// ---------------------------------------------------------------------------
+@media (width <= 1200px) {
+  :root {
+    --app-content-padding: 16px;
+  }
+}
+
+@media (width <= 768px) {
+  :root {
+    --app-content-padding: 12px;
+  }
+
+  .app-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app-pagination {
+    justify-content: center;
+  }
+
+  // 小屏下分页组件隐藏 sizes / jumper，避免溢出
+  .ep-pagination__sizes,
+  .ep-pagination__jump {
+    display: none !important;
+  }
+
+  // 行内操作按钮抬高到 32px，向移动端最小触摸目标靠拢
+  // （small 尺寸默认仅 24px，手指点击容易误触相邻按钮）
+  .app-table-actions .el-button {
+    min-height: 32px;
+  }
+}

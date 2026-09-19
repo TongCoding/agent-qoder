@@ -1,0 +1,49 @@
+# ---------- Java / Maven ----------
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.jar
+*.war
+*.ear
+*.class
+hs_err_pid*
+replay_pid*
+
+# ---------- Node / 前端 ----------
+node_modules/
+dist/
+dist-ssr/
+coverage/
+*.local
+.vite/
+.eslintcache
+# 自动生成的类型声明（如启用 unplugin 自动导入）
+auto-imports.d.ts
+components.d.ts
+
+# ---------- IDE ----------
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.qoder/
+.settings/
+.project
+.classpath
+.factorypath
+
+# ---------- 日志 / 临时文件 ----------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+tmp/
+temp/
+
+# ---------- 操作系统 ----------
+.DS_Store
+Thumbs.db

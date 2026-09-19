@@ -1,0 +1,45 @@
+# ============================================================================
+# 开发环境配置（默认激活）
+# 特点：H2 内存数据库、开启 SQL 日志与 H2 Web 控制台，重启后数据重置
+# ============================================================================
+spring:
+  datasource:
+    # 内存数据库；DB_CLOSE_DELAY=-1 保证连接池释放后数据库不被销毁
+    url: jdbc:h2:mem:taskhub;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+    hikari:
+      pool-name: TaskHubHikariPool
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  jpa:
+    # 方言由 Hibernate 根据 JDBC 元数据自动推断，无需显式配置
+    # 内存库每次启动重建表结构
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  # H2 Web 控制台：http://localhost:8080/h2-console
+  #   JDBC URL: jdbc:h2:mem:taskhub   用户名: sa   密码: (空)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+
+  # 开发环境关闭 thymeleaf 等缓存（本项目未使用模板引擎，此处为通用示例）
+  devtools:
+    restart:
+      enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.example.taskhub: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: DEBUG   # 打印 SQL 绑定参数
+    org.springframework.web: INFO

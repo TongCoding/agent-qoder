@@ -1,0 +1,46 @@
+# ============================================================================
+# 测试环境配置
+# 特点：独立内存库、关闭演示数据与接口文档，保证用例之间互不干扰且结果可预期
+# ============================================================================
+spring:
+  datasource:
+    # 使用独立的数据库名，避免与开发环境实例冲突
+    url: jdbc:h2:mem:taskhub-test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    # 方言由 Hibernate 自动推断
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+  h2:
+    console:
+      enabled: false
+
+app:
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+  # 测试用例自行准备数据，关闭启动时的演示数据写入
+  seed-data: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+logging:
+  level:
+    root: WARN
+    com.example.taskhub: INFO
+    org.hibernate.SQL: WARN
